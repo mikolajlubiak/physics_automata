@@ -8,6 +8,7 @@
 
 namespace physics_automata {
 
+// Bit flags
 enum ElementFeatures : std::uint32_t {
   Fluid = 1 << 0,
   Solid = 1 << 1,
@@ -18,15 +19,23 @@ enum ElementFeatures : std::uint32_t {
 
 class Element {
 public:
-  Element() {}
+  // Default ctor
+  Element() = default;
 
+  // Initialize values
   Element(Color col, std::uint32_t feat) : color(col), features(feat) {}
 
+  // Return elements color
   Color GetColor() { return color; }
+
+  // Return elements features bit field
   std::uint32_t GetFeatures() { return features; }
 
 private:
+  // Element color
   Color color = WHITE;
+
+  // Element features bit field
   std::uint32_t features = 0;
 };
 
