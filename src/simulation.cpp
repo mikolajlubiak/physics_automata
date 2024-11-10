@@ -73,10 +73,20 @@ void Simulation::ProcessMouseInput() {
   m_MousePos = GetMousePosition();
 
   bool is_over_button =
-      CheckButton(0, Element(RED, ElementFeatures::Moveable |
-                                      ElementFeatures::Solid)) ||
-      CheckButton(1, Element(YELLOW, ElementFeatures::Moveable |
-                                         ElementFeatures::Gas)) ||
+      CheckButton(0, Element(RED,
+                             ElementFeatures::Moveable | ElementFeatures::Solid,
+                             {{{0, 1}}, // Down
+                              {
+                                  {-1, 1}, // Down-Left
+                                  {1, 1}   // Down-Right
+                              }})) ||
+      CheckButton(1, Element(YELLOW,
+                             ElementFeatures::Moveable | ElementFeatures::Gas,
+                             {{
+                                 {0, 1},  // Down
+                                 {-1, 1}, // Down-Left
+                                 {1, 1}   // Down-Right
+                             }})) ||
       CheckButton(2, Element(BLUE, ElementFeatures::Immovable |
                                        ElementFeatures::Solid)) ||
       CheckButton(3, Element());
@@ -105,13 +115,8 @@ void Simulation::UpdateElements() {
       m_PixelArray[y * m_ScreenWidth + x] = m_ElementsOld[y][x].GetColor();
 
       // If movable gas
-      if (m_ElementsOld[y][x].GetFeatures() & ElementFeatures::Moveable &&
-          m_ElementsOld[y][x].GetFeatures() & ElementFeatures::Gas) {
-        std::vector<std::pair<std::int8_t, std::int8_t>> directions = {
-            {0, 1},  // Down
-            {-1, 1}, // Down-Left
-            {1, 1}   // Down-Right
-        };
+      for (auto &directions : m_ElementsOld[y][x].GetDirections()) {
+        bool moved = false;
 
         // Shuffle the directions to randomize the order
         std::shuffle(directions.begin(), directions.end(), m_Rng);
@@ -125,41 +130,13 @@ void Simulation::UpdateElements() {
               m_ElementsOld[y + dy][x + dx].GetFeatures() == 0) {
             m_ElementsNew[y + dy][x + dx] = m_ElementsOld[y][x];
             m_ElementsNew[y][x] = Element{};
+            moved = true;
             break; // Exit the loop after moving
           }
         }
-      }
 
-      // If movable solid
-      if (m_ElementsOld[y][x].GetFeatures() & ElementFeatures::Moveable &&
-          m_ElementsOld[y][x].GetFeatures() & ElementFeatures::Solid) {
-        // Check if the space directly below is empty
-        if (y + 1 < m_ScreenHeight &&
-            m_ElementsOld[y + 1][x].GetFeatures() == 0) {
-          m_ElementsNew[y + 1][x] = m_ElementsOld[y][x];
-          m_ElementsNew[y][x] = Element{};
-        } else {
-          // If not moved down, check diagonal movements
-          std::vector<std::pair<std::int8_t, std::int8_t>> directions = {
-              {-1, 1}, // Down-Left
-              {1, 1}   // Down-Right
-          };
-
-          // Shuffle the diagonal directions to randomize the order
-          std::shuffle(directions.begin(), directions.end(), m_Rng);
-
-          for (const auto &dir : directions) {
-            std::int8_t dx = dir.first;  // Change in x
-            std::int8_t dy = dir.second; // Change in y
-
-            // Check if the new position is within bounds and empty
-            if (y + dy < m_ScreenHeight && x + dx < m_ScreenWidth &&
-                m_ElementsOld[y + dy][x + dx].GetFeatures() == 0) {
-              m_ElementsNew[y + dy][x + dx] = m_ElementsOld[y][x];
-              m_ElementsNew[y][x] = Element{};
-              break; // Exit the loop after moving
-            }
-          }
+        if (moved) {
+          break;
         }
       }
     }

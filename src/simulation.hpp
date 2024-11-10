@@ -64,17 +64,11 @@ private: // Attributes
   const std::uint32_t m_ButtonY = 10;
   const std::uint32_t m_ButtonOffset = 10;
 
-  const std::uint32_t m_SecondButtonPosX = m_ButtonOffset * 2 + m_ButtonWidth;
-  const std::uint32_t m_ThirdButtonPosX =
-      m_ButtonOffset * 3 + m_ButtonWidth * 2;
-  const std::uint32_t m_FourthButtonPosX =
-      m_ButtonOffset * 4 + m_ButtonWidth * 3;
-
   // Render texture
-  RenderTexture2D m_RenderTexture;
+  RenderTexture2D m_RenderTexture{};
 
   // Array to hold pixel data
-  Color *m_PixelArray;
+  Color *m_PixelArray = nullptr;
 
   // Old element array
   std::array<std::array<physics_automata::Element, m_ScreenWidth>,
@@ -87,7 +81,7 @@ private: // Attributes
       m_ElementsNew{};
 
   // Random number generator
-  std::mt19937 m_Rng;
+  std::mt19937 m_Rng{};
 
   // Mouse position
   Vector2 m_MousePos{};
@@ -95,8 +89,8 @@ private: // Attributes
   // Mouse drawing radius
   std::uint32_t m_DrawRadius = 16;
 
-  //
-  Element m_ElementToDraw;
+  // Element to be drawn
+  Element m_ElementToDraw{};
 };
 
 } // namespace physics_automata
