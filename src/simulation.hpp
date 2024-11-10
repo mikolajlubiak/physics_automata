@@ -32,7 +32,7 @@ private: // Methods
   void Update();
 
   // Draw simulation state
-  void Draw() const;
+  void Draw();
 
   // Process mouse input
   void ProcessMouseInput();
@@ -40,10 +40,24 @@ private: // Methods
   // Update the elements state
   void UpdateElements();
 
+  void DrawButtons();
+
 private: // Attributes
   // Simulation resolution
   constexpr static std::size_t m_ScreenHeight = 600;
   constexpr static std::size_t m_ScreenWidth = 800;
+
+  // Define button dimensions and positions
+  const std::uint32_t m_ButtonWidth = 100;
+  const std::uint32_t m_ButtonHeight = 30;
+  const std::uint32_t m_ButtonY = 10;
+  const std::uint32_t m_ButtonOffset = 10;
+
+  const std::uint32_t m_SecondButtonPosX = m_ButtonOffset * 2 + m_ButtonWidth;
+  const std::uint32_t m_ThirdButtonPosX =
+      m_ButtonOffset * 3 + m_ButtonWidth * 2;
+  const std::uint32_t m_FourthButtonPosX =
+      m_ButtonOffset * 4 + m_ButtonWidth * 3;
 
   // Render texture
   RenderTexture2D m_RenderTexture;
@@ -69,6 +83,9 @@ private: // Attributes
 
   // Mouse drawing radius
   std::uint32_t m_DrawRadius = 16;
+
+  //
+  Element m_ElementToDraw;
 };
 
 } // namespace physics_automata

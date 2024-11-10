@@ -49,13 +49,14 @@ void Simulation::Update() {
 }
 
 // Draw simulation state
-void Simulation::Draw() const {
+void Simulation::Draw() {
   BeginDrawing();
   ClearBackground(RAYWHITE);
   DrawTexture(m_RenderTexture.texture, 0, 0, WHITE);
   DrawRectangleLines(m_MousePos.x, m_MousePos.y,
                      static_cast<float>(m_DrawRadius),
                      static_cast<float>(m_DrawRadius), GREEN);
+  DrawButtons();
   EndDrawing();
 }
 
@@ -65,40 +66,36 @@ void Simulation::ProcessMouseInput() {
   m_DrawRadius = static_cast<std::uint32_t>(m_DrawRadius + GetMouseWheelMove());
   m_MousePos = GetMousePosition();
 
-  // Movable solid
-  if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-    for (std::size_t i = 0; i < m_DrawRadius; i++) {
-      for (std::size_t j = 0; j < m_DrawRadius; j++) {
-        if (m_MousePos.y + i < m_ScreenHeight &&
-            m_MousePos.x + j < m_ScreenWidth) {
-          m_ElementsNew[m_MousePos.y + i][m_MousePos.x + j] =
-              Element(RED, ElementFeatures::Moveable | ElementFeatures::Solid);
-        }
-      }
-    }
-  }
+  bool isOverButton =
+      (CheckCollisionPointRec(m_MousePos,
+                              {static_cast<float>(m_ButtonOffset),
+                               static_cast<float>(m_ButtonY),
+                               static_cast<float>(m_ButtonWidth),
+                               static_cast<float>(m_ButtonHeight)}) ||
+       CheckCollisionPointRec(m_MousePos,
+                              {static_cast<float>(m_SecondButtonPosX),
+                               static_cast<float>(m_ButtonY),
+                               static_cast<float>(m_ButtonWidth),
+                               static_cast<float>(m_ButtonHeight)}) ||
+       CheckCollisionPointRec(m_MousePos,
+                              {static_cast<float>(m_ThirdButtonPosX),
+                               static_cast<float>(m_ButtonY),
+                               static_cast<float>(m_ButtonWidth),
+                               static_cast<float>(m_ButtonHeight)})) ||
+      CheckCollisionPointRec(m_MousePos,
+                             {static_cast<float>(m_FourthButtonPosX),
+                              static_cast<float>(m_ButtonY),
+                              static_cast<float>(m_ButtonWidth),
+                              static_cast<float>(m_ButtonHeight)});
 
-  // Movable gas
-  if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
-    for (std::size_t i = 0; i < m_DrawRadius; i++) {
-      for (std::size_t j = 0; j < m_DrawRadius; j++) {
-        if (m_MousePos.y + i < m_ScreenHeight &&
-            m_MousePos.x + j < m_ScreenWidth) {
-          m_ElementsNew[m_MousePos.y + i][m_MousePos.x + j] =
-              Element(YELLOW, ElementFeatures::Moveable | ElementFeatures::Gas);
-        }
-      }
-    }
-  }
-
-  // Immovable solid
-  if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-    for (std::size_t i = 0; i < m_DrawRadius; i++) {
-      for (std::size_t j = 0; j < m_DrawRadius; j++) {
-        if (m_MousePos.y + i < m_ScreenHeight &&
-            m_MousePos.x + j < m_ScreenWidth) {
-          m_ElementsNew[m_MousePos.y + i][m_MousePos.x + j] = Element(
-              BLUE, ElementFeatures::Immovable | ElementFeatures::Solid);
+  if (!isOverButton) {
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+      for (std::size_t i = 0; i < m_DrawRadius; i++) {
+        for (std::size_t j = 0; j < m_DrawRadius; j++) {
+          if (m_MousePos.y + i < m_ScreenHeight &&
+              m_MousePos.x + j < m_ScreenWidth) {
+            m_ElementsNew[m_MousePos.y + i][m_MousePos.x + j] = m_ElementToDraw;
+          }
         }
       }
     }
@@ -174,6 +171,80 @@ void Simulation::UpdateElements() {
       }
     }
   }
+}
+
+void Simulation::DrawButtons() {
+  // Movable Solid Button
+  if (CheckCollisionPointRec(m_MousePos,
+                             {static_cast<float>(m_ButtonOffset),
+                              static_cast<float>(m_ButtonY),
+                              static_cast<float>(m_ButtonWidth),
+                              static_cast<float>(m_ButtonHeight)})) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+      m_ElementToDraw =
+          Element(RED, ElementFeatures::Moveable | ElementFeatures::Solid);
+    }
+  }
+  DrawRectangle(static_cast<float>(m_ButtonOffset), m_ButtonY, m_ButtonWidth,
+                m_ButtonHeight,
+                (m_ElementToDraw.GetFeatures() & ElementFeatures::Moveable &&
+                 m_ElementToDraw.GetFeatures() & ElementFeatures::Solid)
+                    ? DARKGRAY
+                    : LIGHTGRAY);
+  DrawText("Movable Solid", m_ButtonOffset + 5, m_ButtonY + 5, 10, BLACK);
+
+  // Movable Gas Button
+  if (CheckCollisionPointRec(GetMousePosition(),
+                             {static_cast<float>(m_SecondButtonPosX),
+                              static_cast<float>(m_ButtonY),
+                              static_cast<float>(m_ButtonWidth),
+                              static_cast<float>(m_ButtonHeight)})) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+      m_ElementToDraw =
+          Element(YELLOW, ElementFeatures::Moveable | ElementFeatures::Gas);
+    }
+  }
+  DrawRectangle(static_cast<float>(m_SecondButtonPosX), m_ButtonY,
+                m_ButtonWidth, m_ButtonHeight,
+                (m_ElementToDraw.GetFeatures() & ElementFeatures::Moveable &&
+                 m_ElementToDraw.GetFeatures() & ElementFeatures::Gas)
+                    ? DARKGRAY
+                    : LIGHTGRAY);
+  DrawText("Movable Gas", m_SecondButtonPosX + 5, m_ButtonY + 5, 10, BLACK);
+
+  // Immovable Solid Button
+  if (CheckCollisionPointRec(GetMousePosition(),
+                             {static_cast<float>(m_ThirdButtonPosX),
+                              static_cast<float>(m_ButtonY),
+                              static_cast<float>(m_ButtonWidth),
+                              static_cast<float>(m_ButtonHeight)})) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+      m_ElementToDraw =
+          Element(BLUE, ElementFeatures::Immovable | ElementFeatures::Solid);
+    }
+  }
+  DrawRectangle(static_cast<float>(m_ThirdButtonPosX), m_ButtonY, m_ButtonWidth,
+                m_ButtonHeight,
+                (m_ElementToDraw.GetFeatures() & ElementFeatures::Immovable &&
+                 m_ElementToDraw.GetFeatures() & ElementFeatures::Solid)
+                    ? DARKGRAY
+                    : LIGHTGRAY);
+  DrawText("Immovable Solid", m_ThirdButtonPosX + 5, m_ButtonY + 5, 10, BLACK);
+
+  // Eraser
+  if (CheckCollisionPointRec(GetMousePosition(),
+                             {static_cast<float>(m_FourthButtonPosX),
+                              static_cast<float>(m_ButtonY),
+                              static_cast<float>(m_ButtonWidth),
+                              static_cast<float>(m_ButtonHeight)})) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+      m_ElementToDraw = Element();
+    }
+  }
+  DrawRectangle(static_cast<float>(m_FourthButtonPosX), m_ButtonY,
+                m_ButtonWidth, m_ButtonHeight,
+                (m_ElementToDraw.GetFeatures() == 0) ? DARKGRAY : LIGHTGRAY);
+  DrawText("Eraser", m_FourthButtonPosX + 5, m_ButtonY + 5, 10, BLACK);
 }
 
 } // namespace physics_automata
