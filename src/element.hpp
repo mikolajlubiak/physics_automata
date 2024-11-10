@@ -26,10 +26,10 @@ public:
   Element(Color col, std::uint32_t feat) : color(col), features(feat) {}
 
   // Return elements color
-  Color GetColor() { return color; }
+  Color GetColor() const { return color; }
 
   // Return elements features bit field
-  std::uint32_t GetFeatures() { return features; }
+  std::uint32_t GetFeatures() const { return features; }
 
 private:
   // Element color

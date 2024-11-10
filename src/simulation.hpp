@@ -32,7 +32,7 @@ private: // Methods
   void Update();
 
   // Draw simulation state
-  void Draw();
+  void Draw() const;
 
   // Process mouse input
   void ProcessMouseInput();
@@ -40,7 +40,18 @@ private: // Methods
   // Update the elements state
   void UpdateElements();
 
-  void DrawButtons();
+  // Turn button index to its X coordinate
+  template <typename T> T ButtonIndexToPos(const T index) const {
+    return m_ButtonOffset * (index + 1) + m_ButtonWidth * index;
+  }
+
+  // Check if button is clicked
+  // Return whether the mouse pointer is over the button
+  bool CheckButton(const std::size_t index, const Element &element);
+
+  // Draw button
+  void DrawButton(const std::size_t index, const char *text,
+                  const std::uint32_t element_features) const;
 
 private: // Attributes
   // Simulation resolution
