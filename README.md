@@ -24,6 +24,7 @@ cmake --build .
 
 * Web:
 ```
+source PATH_TO_EMSDK/emsdk_env.sh
 emrun physics_automata.html
 ```
 
