@@ -64,12 +64,6 @@ private: // Attributes
   const std::uint32_t m_ButtonY = 10;
   const std::uint32_t m_ButtonOffset = 10;
 
-  const std::uint32_t m_SecondButtonPosX = m_ButtonOffset * 2 + m_ButtonWidth;
-  const std::uint32_t m_ThirdButtonPosX =
-      m_ButtonOffset * 3 + m_ButtonWidth * 2;
-  const std::uint32_t m_FourthButtonPosX =
-      m_ButtonOffset * 4 + m_ButtonWidth * 3;
-
   // Render texture
   RenderTexture2D m_RenderTexture;
 
