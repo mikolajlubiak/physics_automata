@@ -33,10 +33,8 @@ Simulation::~Simulation() {
 
 // Simulation loop
 void Simulation::loop() {
-  while (!WindowShouldClose()) {
-    Update();
-    Draw();
-  }
+  Update();
+  Draw();
 }
 
 // Update simulation state

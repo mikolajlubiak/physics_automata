@@ -12,30 +12,34 @@ set(FETCHCONTENT_QUIET OFF)
 
 # Enable flag if supported
 function(enable_cxx_compiler_flag_if_supported flag)
-	string(FIND "${CMAKE_CXX_FLAGS}" "${flag}" flag_already_set)
-	if(flag_already_set EQUAL -1)
-		check_cxx_compiler_flag("${flag}" flag_supported)
-		if(flag_supported)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}" PARENT_SCOPE)
-		endif()
-		unset(flag_supported CACHE)
-	endif()
+  string(FIND "${CMAKE_CXX_FLAGS}" "${flag}" flag_already_set)
+  if(flag_already_set EQUAL -1)
+    check_cxx_compiler_flag("${flag}" flag_supported)
+    if(flag_supported)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}" PARENT_SCOPE)
+    endif()
+    unset(flag_supported CACHE)
+  endif()
 endfunction()
 
 # Get Raylib
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
 set(BUILD_GAMES    OFF CACHE BOOL "" FORCE) # don't build the supplied example games
 
-FetchContent_Declare(
-	raylib
-	GIT_REPOSITORY "https://github.com/raysan5/raylib.git"
-	GIT_TAG "master"
-	GIT_PROGRESS   TRUE
-	GIT_SHALLOW    TRUE
-	EXCLUDE_FROM_ALL
-)
+find_package(raylib QUIET)
 
-FetchContent_MakeAvailable(raylib)
+if(NOT raylib_FOUND)
+  FetchContent_Declare(
+    raylib
+    GIT_REPOSITORY "https://github.com/raysan5/raylib.git"
+    GIT_TAG "master"
+    GIT_PROGRESS   TRUE
+    GIT_SHALLOW    TRUE
+    EXCLUDE_FROM_ALL
+  )
+
+  FetchContent_MakeAvailable(raylib)
+endif()
 
 # Sources
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
@@ -49,10 +53,10 @@ enable_cxx_compiler_flag_if_supported("-Wextra")
 enable_cxx_compiler_flag_if_supported("-pedantic")
 
 # Make proper web build
-if (EMSCRIPTEN)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_GLFW=3 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s GL_ENABLE_GET_PROC_ADDRESS=1")
-	set(CMAKE_EXECUTABLE_SUFFIX ".html")
-endif ()
+if(EMSCRIPTEN)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_GLFW=3 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s GL_ENABLE_GET_PROC_ADDRESS=1")
+  set(CMAKE_EXECUTABLE_SUFFIX ".html")
+endif()
 
 # Add binary
 add_executable(${PROJECT_NAME})
