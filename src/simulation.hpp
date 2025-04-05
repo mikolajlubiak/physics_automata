@@ -55,8 +55,8 @@ private: // Methods
 
 private: // Attributes
   // Simulation resolution
-  constexpr static std::size_t m_ScreenHeight = 600;
-  constexpr static std::size_t m_ScreenWidth = 800;
+  constexpr static std::size_t m_ScreenHeight = 700;
+  constexpr static std::size_t m_ScreenWidth = 1200;
 
   // Define button dimensions and positions
   const std::uint32_t m_ButtonWidth = 100;

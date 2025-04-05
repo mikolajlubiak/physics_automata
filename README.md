@@ -10,6 +10,9 @@ cmake -S . -B build
 
 # Build
 cmake --build build
+
+# Run
+build/physics_automata
 ```
 
 * Web:
@@ -25,4 +28,3 @@ cmake --build build_web
 # Host
 emrun build_web/physics_automata.html
 ```
-
